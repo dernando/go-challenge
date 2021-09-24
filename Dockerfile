@@ -1,8 +1,14 @@
-FROM golang:1.17
+FROM golang:1.17 as hello-go
 
 WORKDIR /go/src/app
-COPY . .
-RUN go get -d -v ./...
-RUN go install -v ./...
+COPY app.go .
 
-CMD ["app"]
+RUN go mod init
+#RUN export GOROOT=/go/src/app
+RUN go build
+
+FROM scratch
+
+COPY --from=hello-go /go/src/app/app .
+
+CMD ["./app"]
